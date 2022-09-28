@@ -1,34 +1,40 @@
   @extends('template')
   @section('content')
   
-  <div class="row mt-5">
-    <div class = 'container'>
-        <div class='container mt-5'>
-        <h2 class = 'text-center'>LISTA DE CURSOS</h2>
+
+
+
+        <h1 class = 'text-center my-3'>CURSOS</h1>
+        <hr>
+
+    
+    
+    <div class='container col-8 m-auto border rounded shadow-lg' style="background-color: #c0c0c0">
+    <div class="d-grid gap-2 col-2 mx-auto my-3 " >
+
+          <button class="btn btn-primary btn-lg"><a href="{{route('create')}}" class="text-white text-decoration-none">Cadastrar curso</a></button>
         </div>
-    </div>
-    
-    
-    <div class='container col-8 m-auto'>
-    <table class="table table-dark rounder">
+    <table class="table table-light table-striped">
   <thead class='thead-dark'>
     <tr>
+        <th scope='col'>ID do Usuario</th>
         <th scope='col'>Titulo</th>
         <th scope='col'>Preço R$</th>
         <th scope='col'>Descrição</th>
-        <th scope='col'>Arquivo</th>
+        <th scope='col'>Imagem</th>
         <th scope='col'>Ações</th>  
     </tr>
   </thead>
   <tbody>
     @foreach($curso as $cursos)
     <tr>
+      <td>{{$cursos->id_user}}</td>
       <td>{{$cursos->titulo}}</td>
       <td>{{$cursos->preco}}</td>
       <td>{{$cursos->descricao}}</td>
       <td>
         @if(isset($cursos->imagem))
-        <img src="{{asset("{storage/$cursos->imagem}")}}">
+        <img src="{{asset("storage/{$cursos->imagem}")}}" height="80" width="75">
         @else
         <img src="https://i.pinimg.com/236x/bd/5d/6e/bd5d6ec5f3af0974320f1209faca2ce3.jpg" width="80" height="80">
         @endif
@@ -57,14 +63,12 @@
       @endforeach
 
   </tbody>
+
 </table>
+      {{$curso->links()}}
     </div>
-  <div class="container">
-    <a href="{{url('/cursos/cadastro')}}" class="">
-          <button class="btn btn-success">Cadastrar curso</button>
-        </a>
-        </div>
-        </div>
+  
+
     
     </body>
     @endsection

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Models\ModelCurso;
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
 class cursoController extends Controller
@@ -16,25 +17,29 @@ class cursoController extends Controller
     private $objUser;
     private $objCurso;
 
+    
+
 
     public function __construct()
     {   
         $this->objUser = new User();
         $this->objCurso = new ModelCurso();
 
-        //$this->middleware('auth')->only(['create', 'update', 'destroy', 'store']);
+        $this->middleware('auth');
     }
 
     
-    public function template()
+    public function principal()
     {
-        return view('template');
+        return view('principal');
     }
 
-    public function index()
+    public function cursos()
     {
         $curso=$this->objCurso->all();
-        return view('index', compact('curso'));
+        $user=$this->objUser->all();
+        $curso = $this->objCurso->paginate(3);
+        return view('index', compact('curso', 'user'));
     }
 
     /**
@@ -42,10 +47,11 @@ class cursoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {   
-        $users=$this->objUser->all();
-        return view('create',compact('users'));
+        $users=$this->objUser->find($request->id);
+
+        return view('create', compact('users'));
     }
 
     /**
@@ -56,15 +62,17 @@ class cursoController extends Controller
      */
     public function store(Request $request)
     {
-        $this->objCurso->create([
+        $id = Auth::id();
+        
+        $curso = $this->objCurso->create([
             'titulo' => $request->titulo,
             'preco' => $request->preco,
             'descricao' => $request->descricao,
-            'id_user' => $request->id_user,
-            'imagem' => $request->imagem
+            'id_user' => $id,
+            'imagem' => $request->file('imagem')->store('img', 'public')
         ]);
 
-        return redirect()->action('App\Http\Controllers\cursoController@index');
+        return redirect()->action('App\Http\Controllers\cursoController@cursos');
     }
     /**
      * Display the specified resource.
@@ -83,10 +91,10 @@ class cursoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Request $request)
     {
-        $curso= $this->objCurso->find($id);
-        $users=$this->objUser->all();
+        $curso= $this->objCurso->find($request->id);
+        $users=$this->objUser->find($request->id);
 
         $curso->save();
 
@@ -100,8 +108,10 @@ class cursoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
+        $id = Auth::id();
+
         $curso=$this->objCurso->findOrFail($request->id);
 
         $titulo = $request->titulo;
@@ -114,7 +124,7 @@ class cursoController extends Controller
 
         $curso->save();
 
-        return redirect()->action('App\Http\Controllers\cursoController@index');
+        return redirect()->action('App\Http\Controllers\cursoController@cursos');
 
     }
 
@@ -128,22 +138,21 @@ class cursoController extends Controller
     {
         $cursos = ModelCurso::find($id)->delete();
         
-        return redirect('/cursos')->with('msg', 'Curso excluido!');
+        return redirect('/cursos');
     }
 
     public function login(){
         return view('login');
     }
 
+
     public function cadastro(){
         return view('cadastro');
     }
 
-    public function entrar(Request $request){
-        if(Auth::attempt(['email' => $request-> email, 'password' => $request-> password])){
-            
-        }
-    }
+
+
+
 
     
 }

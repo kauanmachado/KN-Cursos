@@ -20,7 +20,7 @@ class CreateModelCursosTable extends Migration
             $table->string('titulo');
             $table->double('preco', 10, 2);
             $table->string('descricao');
-            $table->blob('imagem');
+            $table->string('imagem')->nullable();
 
             $table->timestamps();
         });
